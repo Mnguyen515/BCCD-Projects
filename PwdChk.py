@@ -14,6 +14,7 @@ def check_password_strength(password, dictionary_file="common_passwords.txt"):
     digit_error = "Password should contain at least one digit."
     special_char_error = "Password should contain at least one special character."
     dictionary_error = "Password found in common password list. Please change it."
+    white_space_error = "Password should not contain any whitespace."
 
     # Set list for errors
     errors = []
@@ -29,6 +30,8 @@ def check_password_strength(password, dictionary_file="common_passwords.txt"):
         errors.append(digit_error)
     if not re.search(r"[!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?]", password):
         errors.append(special_char_error)
+    if re.search(r"\s", password):
+        errors.append(white_space_error)
     if password.lower() in common_passwords:
         errors.append(dictionary_error)
 
