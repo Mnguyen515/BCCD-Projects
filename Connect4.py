@@ -27,7 +27,7 @@ def get_next_open_row(board,col):
         
 # Function will print the board after every move
 def print_board(board):
-    print(np.flip(board,0))
+    print(np.flip(board,0), '\n')
 
 # Function returns true after analyzing the board for a 4 in a row in possible direction
 def winning_move(board, piece):
@@ -64,30 +64,52 @@ turn = 0
 # Prompt a turn for each player until one of them gets 4 in a row
 while not game_over:
     #Ask for player 1 input
+    check = 0
     if turn == 0:
-        col = int(input("Player 1, Make your Selection(0-8):"))
-        #Player 1 will drop a piece on the board
-        if is_valid_location(board,col):
-            row = get_next_open_row(board,col)
-            drop_piece(board,row,col,1)
-            if winning_move(board, 1):
-                print("PLAYER 1 WINS!")
-                game_over = True
+        while check == 0:
+            try:
+                col = int(input("Player 1, Make your Selection(0-7): "))
+
+                # Ensure only numbers 0 - 7 are entered
+                assert col > -1
+
+                #Player 1 will drop a piece on the board
+                if is_valid_location(board,col):
+                    row = get_next_open_row(board,col)
+                    drop_piece(board,row,col,1)
+                    if winning_move(board, 1):
+                        print("PLAYER 1 WINS!\n")
+                        game_over = True
+                    print_board(board)
+                    check = 1
+                    
+            except (ValueError, IndexError, AssertionError):
+                print("Invalid input!\n")
+                print_board(board)
          
     #Ask for player 2 input
     else:
-        col = int(input("Player 2, Make your Selection(0-8):"))
-        #Player 2 will drop a piece on the board
-        if is_valid_location(board,col):
-            row = get_next_open_row(board,col)
-            drop_piece(board,row,col,2)
-            if winning_move(board, 1):
-                print("PLAYER 2 WINS!")
-                game_over = True
+        while check == 0:
+            try:
+                col = abs(int(input("Player 2, Make your Selection(0-7): ")))
 
-    # Reprint the board after every turn
-    print_board(board)
-    
+                # Ensure that only numbers 0 -7 are entered
+                assert col > -1
+
+                #Player 2 will drop a piece on the board
+                if is_valid_location(board,col):
+                    row = get_next_open_row(board,col)
+                    drop_piece(board,row,col,2)
+                    if winning_move(board, 1):
+                        print("PLAYER 2 WINS!\n")
+                        game_over = True
+                    check = 1
+                    print_board(board)
+
+            except (ValueError, IndexError, AssertionError):
+                print("Invalid input!\n")
+                print_board(board)
+
     # Increment the turns
     turn += 1
     turn = turn % 2
