@@ -243,5 +243,7 @@ int main()
             check = 1; // Ensure to exit loop
         }
     }
+    // Free memory
+    free(list_pwd);
     return 0;
 }
