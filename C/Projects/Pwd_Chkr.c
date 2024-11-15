@@ -1,7 +1,17 @@
+// Import headers
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <regex.h>
+
+// This function clears the terminal screen
+void clear_screen()
+{
+    char ch;
+    // Clear terminal screen
+    ch = getchar();
+    getchar(); // Wait for the user to press Enter
+    system("clear"); 
+}
 
 // This Function checks the passwords' length an updates strength
 int check_length(char *pwd, int strgth)
@@ -33,7 +43,7 @@ int check_char(char *pwd, int strgth)
 {
     int hasLower = 0, hasUpper = 0, hasDigit = 0, hasSpecial = 0;
 
-    // Check for character types
+    // Check for character types and add to score
     for (int i = 0; i < strlen(pwd); i++) 
     {
         if (pwd[i] >= 'a' && pwd[i] <= 'z') 
@@ -70,7 +80,7 @@ int check_char(char *pwd, int strgth)
             hasSpecial += 1;
         }
     }
-
+    // Print appropriate message for missing character types
     if(hasLower == 0)
     {
         printf("\nThe password does not contain any lowercase letters.\n");
@@ -99,32 +109,139 @@ int check_char(char *pwd, int strgth)
     return strgth += hasLower + hasUpper + hasDigit + hasSpecial;
 }
 
-int main() {
-    char password[100];
-    int *length = 0, strength = 0;
-
-    printf("Enter password: ");
-    scanf("%s", password);
-
-    strength = check_length(password, strength) + check_char(password, strength);
-
-    if(strength < 10)
+// This Function checks your password strength score value and prints the appropriate message
+char *check_score(int str_val)
+{
+    char *strength;
+    // Check passowrd strength based on score
+    if(str_val < 10)
     {
-        printf("\nPassword strength score: %d", strength);
-        printf("\nYour password strength is poor.");
+        printf("\nYour password strength is poor.\n");
+        strength = "poor";
     }
     
-    else if(strength >= 10 && strength < 20)
+    else if(str_val >= 10 && str_val < 20)
     {
-        printf("\nPassword strength score: %d", strength);
-        printf("\nYour password strength is moderate.");
+        printf("\nYour password strength is moderate.\n");
+        strength = "moderate";
     }
 
-    else if (strength >= 20)
+    else if (str_val >= 20)
     {
-        printf("\nPassword strength score: %d", strength);
-        printf("\nYour password strength is excellent.");
+        printf("\nYour password strength is excellent.\n");
+        strength = "excellent";
     }
 
+    return strength;
+}
+
+int main() 
+{
+    // Initialize vars, arrays
+    const int SIZE = 100;
+    char password1[100];
+    int list_score[10];
+    int strength, check = 0, list_index = 0, option;
+    // Allocate memory for strings and error check
+    char **list_pwd = (char**)malloc(SIZE * sizeof(char)*SIZE);
+    // Check if memory failed to allocate
+    if (list_pwd == NULL) 
+    {
+        fprintf(stderr, "Memory allocation failed\n");
+        return 1;
+    }
+
+    // Continuously ask the user for input until they exit
+    while(check == 0)
+    {
+        // Prompt user for menu options
+        printf("*** Password Strength Checker Menu ***\n");
+        printf("Enter 1 to access the password stength checking program.\n");
+        printf("Enter 2 to see the Password Criteria.\n");
+        printf("Enter 3 to view past entries and scores.\n");
+        printf("Enter 4 to exit the program.\n");
+        scanf("%d", &option);
+        system("clear"); // Clear terminal screen
+
+        if(option == 1)
+        {
+            printf("Enter a password: \n");
+            scanf("%s", password1);
+            if(password1 != NULL)
+            {
+                // Reset strength to 0 everytime user puts in new password
+                strength = 0;
+                int i;
+                // Calulate strength value
+                strength = check_length(password1, strength) + check_char(password1, strength);
+                printf("\nPassword strength score: %d\n", strength);
+                // Run through user input and copy it to password list
+                for (i = 0; i < strlen(password1); i++) 
+                {
+                    // Allocate memory for each string
+                    list_pwd[i] = (char*)malloc((SIZE) * sizeof(char));
+                    // Return error if failed to allocate memory
+                    if (list_pwd[i] == NULL) 
+                    {
+                        fprintf(stderr, "Memory allocation failed\n");
+                        return 1;
+                    }
+                    // Put password into the list
+                    strncpy(*list_pwd, password1, strlen(password1));
+                }
+                // Pointer arithmetic used to move along list
+                list_pwd += SIZE;
+                // Add password strength score to strength list
+                list_score[list_index] = strength;
+                // Iterate the strength score list
+                list_index++;
+            }
+
+            printf("Press Enter to continue...\n");
+            clear_screen(); 
+        }
+
+        else if (option == 2)
+        {
+            printf("*** Password Criteria ***\n");
+            printf("1. Must be more than 8 characters long.\n");
+            printf("2. Must contain lowercase characters.\n");
+            printf("3. Must contain uppercase characters.\n");
+            printf("4. Must contain digits.\n");
+            printf("5. Must contain special characters.\n");
+            printf("Press Enter to continue...\n");
+            clear_screen();
+        }
+        
+        else if (option == 3)
+        {
+            if (*list_score != NULL)
+            {
+                // Move pointer back to index 0
+                list_pwd -= (SIZE * list_index);
+                for(int i = 0; i < list_index; i++)
+                {
+                    printf("Password: %s\n", *list_pwd);
+                    printf("Score: %d\n", list_score[i]);
+                    // Move pointer up to next block
+                    list_pwd += SIZE;
+                }
+                printf("Press Enter to continue...\n");
+                clear_screen(); 
+            }
+            else
+            {
+                printf("No Passwords saved in list yet.\n");
+                printf("Press Enter to continue...\n");
+                clear_screen(); 
+            }
+        }
+
+        else if (option == 4)
+        {
+            printf("Exiting program...\n");
+            check = 1; // Ensure to exit loop
+        }
+    }
     return 0;
 }
