@@ -110,29 +110,23 @@ int check_char(char *pwd, int strgth)
 }
 
 // This Function checks your password strength score value and prints the appropriate message
-char *check_score(int str_val)
+void check_score(int str_val)
 {
-    char *strength;
     // Check passowrd strength based on score
     if(str_val < 10)
     {
         printf("\nYour password strength is poor.\n");
-        strength = "poor";
     }
     
     else if(str_val >= 10 && str_val < 20)
     {
         printf("\nYour password strength is moderate.\n");
-        strength = "moderate";
     }
 
     else if (str_val >= 20)
     {
         printf("\nYour password strength is excellent.\n");
-        strength = "excellent";
     }
-
-    return strength;
 }
 
 int main() 
@@ -154,6 +148,7 @@ int main()
     // Continuously ask the user for input until they exit
     while(check == 0)
     {
+        option = 0;
         // Prompt user for menu options
         printf("*** Password Strength Checker Menu ***\n");
         printf("Enter 1 to access the password stength checking program.\n");
@@ -175,6 +170,7 @@ int main()
                 // Calulate strength value
                 strength = check_length(password1, strength) + check_char(password1, strength);
                 printf("\nPassword strength score: %d\n", strength);
+                check_score(strength);
                 // Run through user input and copy it to password list
                 for (i = 0; i < strlen(password1); i++) 
                 {
@@ -242,8 +238,20 @@ int main()
             printf("Exiting program...\n");
             check = 1; // Ensure to exit loop
         }
+
+        else
+        {
+            printf("Please enter a number 1 - 4.\n\n");
+            printf("Press Enter to continue...\n");
+            clear_screen(); 
+        }
     }
     // Free memory
-    free(list_pwd);
+    if(list_pwd != NULL)
+    {
+        // Move pointer back to index 0
+        list_pwd -= (SIZE * list_index);
+        free(list_pwd);
+    }
     return 0;
 }
